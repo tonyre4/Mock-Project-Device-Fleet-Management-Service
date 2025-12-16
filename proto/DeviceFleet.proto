@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+// Device possible status
+enum DeviceStatus {
+    IDLE = 0;
+    BUSY = 1;
+    OFFLINE = 2;
+    ONLINE = 3;
+    MAINTENANCE = 4;
+    UPDATING = 5;
+    RECOVERING = 6;
+    ERROR = 7;
+}
+
+// Device possible actions
+enum DeviceAction {
+    PLACEHOLDER = 0;
+    DO_SOMETHING_BUSY = 1;
+    GO_OFFLINE = 2;
+    GO_ONLINE = 3;
+    GET_MAINTENANCE = 4;
+    SOFTWARE_UPDATE = 5;
+    RECOVER_DEVICE = 6;
+}
+
+// Action possible status
+enum DeviceActionStatus {
+    PENDING = 0;
+    RUNNING = 1;
+    COMPLETED = 2;
+    FAILED = 3;
+}
+
+// Device info
+message DeviceInfo {
+    DeviceStatus currentStatus = 1;
+    DeviceAction lastAction = 2;
+    DeviceActionStatus lastActionStatus = 3;
+    string detailed_info = 4;
+}
+
+// RegisterDevice: Adds a new device to the fleet. Input: Device ID, initial state
+message RegisterDeviceRequest {
+    int64 id = 1;
+    DeviceStatus initialState = 2;
+}
+
+message RegisterDeviceResponse {}
+
+// SetDeviceStatus: Manually sets a device's status. Input: Device ID, Status (e.g., IDLE, BUSY, OFFLINE, MAINTENANCE). 
+message SetDeviceStatusRequest {
+    int64 id = 1;
+    DeviceStatus setDeviceTo = 2;
+}
+
+message SetDeviceStatusResponse {}
+
+// GetDeviceInfo: Retrieves the current state and info for a Device ID.
+
+message GetDeviceInfoRequest {
+    int64 id = 1;
+}
+
+message GetDeviceInfoResponse {
+    DeviceInfo deviceInfo= 1;
+}
+
+// InitiateDeviceAction: Triggers a mock long-running action on a device. Input: Device ID, ActionType (e.g., SOFTWARE_UPDATE), ActionParams (e.g., software version). This should: 
+
+message InitiateDeviceActionRequest {
+    int64 id = 1;
+    DeviceAction actionToPerform = 2;
+    string parametersAsJson = 3;
+}
+
+message InitiateDeviceActionResponse {
+    int64 actionId = 1;
+}
+
+//GetDeviceActionStatus: Checks the status of a previously initiated action using the Action ID. Output: Action Status (e.g., PENDING, RUNNING, COMPLETED, FAILED).
+message GetDeviceActionStatusRequest {
+    int64 actionId = 1;
+}
+
+message GetDeviceActionStatusResponse {
+    DeviceActionStatus actionStatus = 1;
+}
+
+
+// Services
+service DeviceFleetService{
+    rpc RegisterDevice(RegisterDeviceRequest) returns (RegisterDeviceResponse);
+    rpc SetDeviceStatus(SetDeviceStatusRequest) returns (SetDeviceStatusResponse);
+    rpc GetDeviceInfo(GetDeviceInfoRequest) returns (GetDeviceInfoResponse);
+    rpc InitiateDeviceAction(InitiateDeviceActionRequest) returns (InitiateDeviceActionResponse);
+    rpc GetDeviceActionStatus(GetDeviceActionStatusRequest) returns (GetDeviceActionStatusResponse);
+}
