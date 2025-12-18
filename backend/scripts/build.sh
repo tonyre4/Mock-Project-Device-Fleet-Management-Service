@@ -1,21 +1,19 @@
 #!/bin/bash
 
-set -e
+set -ex
 
-readonly THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source ${THIS_SCRIPT_DIR}/common.sh
+source $(dirname "$0")/common.sh
 
-build_docker_image(){
-    ${DOCKER_EXE} build -t ${DOCKER_INSTANCE_NAME} ${DOCKER_FILE_LOCATION}   
-}
+build(){
+    remove_docker_container
+    remove_docker_image
 
-start_docker_container(){
-    ${DOCKER_EXE} run --name ${DOCKER_INSTANCE_NAME} ${DOCKER_INSTANCE_NAME}
+    build_docker_image
 }
 
 main(){
     get_docker_exe
-    build_docker_image
+    build
 }
 
 main $@
